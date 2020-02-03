@@ -16,6 +16,26 @@ pipeline {
                 sh '/usr/bin/mvn package'
             }
         }
+        stage ('Code_Upload') {
+            steps {
+				
+					nexusArtifactUploader(
+						nexusVersion: 'nexus3',
+						protocol: 'http',
+						nexusUrl: '10.75.242.71:8080',
+						groupId: 'com.genpact.LiveSpread',
+						version: '${BUILD_NUMBER}',
+						repository: 'Cora_LS_PIMCO_Dev',
+						credentialsId: 'nexus',
+						artifacts: [
+						    [artifactId: 'LiveSpread',
+						    classifier: '',
+					        file: '/var/jenkins/workspace/Cora_LS_PIMCO_Dev/target/LiveSpread.war',
+							type: 'war']
+					    ]
+					)
+			}
+        }
         stage ('Terraform_Init') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'af6743e9-f229-4e07-a4a2-f3bb2a9510ca', passwordVariable: 'pwd', usernameVariable: 'usr')]){
